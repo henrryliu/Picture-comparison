@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Before / After 圖片比較器</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom right, #d6f0ff, #fefcff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: sans-serif;
+    }
+    .compare-container {
+      position: relative;
+      width: 1280px;
+      height: 619px;
+      overflow: hidden;
+      border-radius: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      user-select: none;
+    }
+
+    .compare-container img {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      top: 0;
+      left: 0;
+    }
+
+    .before-image {
+      clip-path: inset(0 50% 0 0); /* 一開始只顯示左半 */
+      z-index: 2;
+    }
+
+    .after-image {
+      z-index: 1;
+    }
+
+    .slider {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 40px;
+      transform: translateX(-50%);
+      z-index: 3;
+      cursor: ew-resize;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slider::before {
+      content: "⇔";
+      font-size: 24px;
+      color: white;
+      background: #444;
+      padding: 10px;
+      border-radius: 50%;
+      box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+
+    .label {
+      position: absolute;
+      top: 10px;
+      padding: 5px 15px;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border-radius: 20px;
+      font-size: 16px;
+      z-index: 4;
+    }
+    .label.before {
+      left: 10px;
+    }
+    .label.after {
+      right: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="compare-container" id="compareBox">
+  <img src="image1.png" class="after-image" alt="After">
+  <img src="image2.png" class="before-image" id="beforeImg" alt="Before">
+  <div class="slider" id="slider"></div>
+  <div class="label before">1978</div>
+  <div class="label after">2025</div>
+</div>
+
+<script>
+  const compareBox = document.getElementById('compareBox');
+  const slider = document.getElementById('slider');
+  const beforeImg = document.getElementById('beforeImg');
+
+  let isDragging = false;
+
+  function updateSlider(x) {
+    const rect = compareBox.getBoundingClientRect();
+    let offsetX = x - rect.left;
+    offsetX = Math.max(0, Math.min(offsetX, rect.width));
+
+    const percent = (offsetX / rect.width) * 100;
+    beforeImg.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+    slider.style.left = `${percent}%`;
+  }
+
+  slider.addEventListener('mousedown', () => isDragging = true);
+  window.addEventListener('mouseup', () => isDragging = false);
+  window.addEventListener('mousemove', (e) => {
+    if (isDragging) updateSlider(e.clientX);
+  });
+
+  window.addEventListener('load', () => {
+    updateSlider(compareBox.offsetWidth / 2);
+  });
+</script>
+
+</body>
+</html>
